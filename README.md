@@ -1,4 +1,6 @@
-# RAD System — Refund Abuse Detection
+# RAD System | Refund Abuse Detection
+
+A rad system indeed.
 
 A real-time refund abuse detection and decision support system for experience marketplaces. Built as a fully functional Streamlit prototype with a live scoring engine, LLM-assisted communication layer, and full audit trail. Not a demo — the engine computes live from the database for every assessment.
 
