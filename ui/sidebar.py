@@ -26,7 +26,7 @@ def render_sidebar():
     with st.sidebar:
         # Onboarding block
         st.markdown("""
-        <div style="background:#eef2ff;border-radius:10px;padding:14px;margin-bottom:16px;border:1px solid #c7d2fe;">
+        <div class="rad-sidebar-card rad-onboard">
             <div style="font-size:1.1em;font-weight:700;">🔍 RAD System Prototype</div>
             <div style="font-size:0.9em;margin-top:6px;">
                 This is a working refund abuse detection system. Pick a scenario
@@ -85,7 +85,7 @@ def render_sidebar():
         # Free Exploration section
         st.markdown("---")
         st.markdown("""
-        <div style="background:#f0fdf4;border-radius:10px;padding:14px;margin-top:8px;border:1px solid #bbf7d0;">
+        <div class="rad-sidebar-card rad-explore" style="margin-top:8px;">
             <div style="font-size:1em;font-weight:700;">🧪 Try Any Order</div>
             <div style="font-size:0.85em;margin-top:4px;">
                 The system works with any order in the database. Enter an order ID

@@ -17,6 +17,18 @@ def render_l2_dashboard():
     st.markdown("## L2 Floor Manager Dashboard")
 
     l2_queue = st.session_state.get("l2_queue", [])
+    pending_count = sum(1 for case in l2_queue if case.get("status") == "pending")
+    resolved_count = sum(1 for case in l2_queue if case.get("status") == "resolved")
+
+    if l2_queue:
+        col1, col2 = st.columns([2, 3])
+        with col1:
+            st.metric("Pending Escalations", pending_count)
+        with col2:
+            st.caption(
+                "Review pending escalations first. "
+                "Resolved cases remain available for audit and context."
+            )
 
     if not l2_queue:
         st.info(
@@ -27,6 +39,14 @@ def render_l2_dashboard():
 
     # Escalation Queue
     st.markdown("### Escalation Queue")
+    if pending_count > 0:
+        st.info(
+            f"There are {pending_count} pending escalated case(s) requiring L2 action."
+        )
+    else:
+        st.success(
+            f"All escalated cases are resolved. Total resolved cases: {resolved_count}."
+        )
 
     # Sort by risk score descending
     sorted_queue = sorted(

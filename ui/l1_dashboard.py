@@ -593,9 +593,18 @@ def _resolve_case(action: str, decision: str, override_reason: str | None = None
 
 def _render_resolved():
     msg = st.session_state.get("resolution_message", "Case resolved.")
+    is_l2_escalation = "L2 Dashboard" in msg
+
+    if is_l2_escalation:
+        st.success(
+            "Case escalated to L2 successfully. "
+            "Switch to the L2 Floor Manager dashboard to review and resolve."
+        )
+        st.caption("The evidence packet has already been queued for floor manager review.")
+
     render_chat_message("system", msg.replace("\n", "<br>"))
 
-    if "L2 Dashboard" in msg:
+    if is_l2_escalation:
         if st.button("Go to L2 Dashboard →", key="goto_l2"):
             st.session_state.active_view = "L2 Floor Manager"
             st.rerun()

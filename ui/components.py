@@ -26,25 +26,170 @@ CLASSIFICATION_CONFIG = {
 def inject_custom_css():
     st.markdown("""
     <style>
+    :root {
+        --rad-text: #1f2937;
+        --rad-subtle: #6b7280;
+        --rad-surface: #ffffff;
+        --rad-surface-muted: #f8fafc;
+        --rad-border: #e5e7eb;
+        --rad-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 6px 14px rgba(16, 24, 40, 0.04);
+        --rad-radius: 12px;
+    }
+
+    .stApp {
+        font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .block-container {
+        padding-top: 1.2rem;
+        max-width: 1260px;
+    }
+
+    h1, h2, h3 {
+        letter-spacing: -0.02em;
+        color: #111827;
+        font-weight: 700;
+    }
+
+    h2 {
+        margin-top: 0.4rem;
+        margin-bottom: 0.7rem;
+        font-size: 1.55rem;
+    }
+
+    h3 {
+        margin-top: 0.35rem;
+        margin-bottom: 0.55rem;
+        font-size: 1.2rem;
+    }
+
     .profile-strip {
-        border: 1px solid #ddd; border-radius: 8px; padding: 12px 18px;
-        margin-bottom: 12px; background: #f8f9fa;
+        border: 1px solid var(--rad-border);
+        border-radius: var(--rad-radius);
+        padding: 12px 18px;
+        margin-bottom: 12px;
+        background: var(--rad-surface);
+        color: var(--rad-text);
+        box-shadow: var(--rad-shadow);
     }
     .profile-strip .disp-dot {
         display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px;
     }
     .risk-card {
-        border-radius: 10px; padding: 16px 20px; margin: 10px 0;
-        border-left: 5px solid; color: #1a1a1a;
+        border-radius: var(--rad-radius);
+        padding: 16px 20px;
+        margin: 12px 0;
+        border-left: 5px solid;
+        color: var(--rad-text);
+        border: 1px solid var(--rad-border);
+        box-shadow: var(--rad-shadow);
     }
-    .chat-system { background: #f0f4f8; border-radius: 10px; padding: 14px; margin: 8px 0; border-left: 3px solid #3498db; }
-    .chat-customer { background: #fff8e1; border-radius: 10px; padding: 14px; margin: 8px 0; border-left: 3px solid #f39c12; }
-    .chat-agent { background: #e8f5e9; border-radius: 10px; padding: 14px; margin: 8px 0; border-left: 3px solid #27ae60; }
-    .chat-guidance { background: #f3e5f5; border-radius: 10px; padding: 14px; margin: 8px 0; border-left: 3px solid #7e57c2; }
-    .layer-box { border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin: 6px 0; background: #fafafa; }
-    .scenario-card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 14px; margin: 4px 0; cursor: pointer; }
-    .scenario-card:hover { background: #f5f5f5; }
+    .chat-system,
+    .chat-customer,
+    .chat-agent,
+    .chat-guidance {
+        border-radius: var(--rad-radius);
+        padding: 14px;
+        margin: 10px 0;
+        color: var(--rad-text);
+        border: 1px solid var(--rad-border);
+        box-shadow: 0 1px 1px rgba(16, 24, 40, 0.04), 0 3px 8px rgba(16, 24, 40, 0.04);
+        line-height: 1.5;
+    }
+    .chat-system { background: #f1f7ff; border-left: 3px solid #3498db; }
+    .chat-customer { background: #fff7eb; border-left: 3px solid #f39c12; }
+    .chat-agent { background: #edf9f2; border-left: 3px solid #27ae60; }
+    .chat-guidance { background: #f5f0ff; border-left: 3px solid #7e57c2; }
+    .chat-system strong,
+    .chat-customer strong,
+    .chat-agent strong,
+    .chat-guidance strong {
+        color: #111827;
+    }
+    .layer-box {
+        border: 1px solid var(--rad-border);
+        border-radius: var(--rad-radius);
+        padding: 12px;
+        margin: 8px 0;
+        background: var(--rad-surface);
+        color: var(--rad-text);
+    }
+    .scenario-card {
+        border: 1px solid var(--rad-border);
+        border-radius: var(--rad-radius);
+        padding: 10px 14px;
+        margin: 4px 0;
+        cursor: pointer;
+        background: var(--rad-surface);
+        color: var(--rad-text);
+    }
+    .scenario-card:hover { background: #f9fafb; }
     div[data-testid="stExpander"] details summary p { font-weight: 600; }
+    div[data-testid="stExpander"] details {
+        border: 1px solid var(--rad-border);
+        border-radius: var(--rad-radius);
+        padding: 4px 8px;
+        background: var(--rad-surface);
+    }
+
+    div[data-testid="stButton"] > button {
+        border-radius: 10px !important;
+        border: 1px solid #d1d5db !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.01em;
+        min-height: 2.45rem;
+        transition: all 0.15s ease-in-out;
+    }
+    div[data-testid="stButton"] > button:hover {
+        border-color: #9ca3af !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(16, 24, 40, 0.08);
+    }
+
+    [data-testid="stSidebar"] .rad-sidebar-card {
+        border: 1px solid var(--rad-border);
+        border-radius: var(--rad-radius);
+        padding: 14px;
+        margin-bottom: 14px;
+        color: var(--rad-text);
+        box-shadow: var(--rad-shadow);
+    }
+    [data-testid="stSidebar"] .rad-sidebar-card p,
+    [data-testid="stSidebar"] .rad-sidebar-card div {
+        color: var(--rad-text);
+    }
+    [data-testid="stSidebar"] .rad-onboard {
+        background: #eef3ff;
+        border-color: #c7d2fe;
+    }
+    [data-testid="stSidebar"] .rad-explore {
+        background: #ecfbf3;
+        border-color: #b7ebd0;
+    }
+
+    div[data-testid="stTabs"] button[role="tab"] {
+        border-radius: 8px 8px 0 0;
+        font-weight: 600;
+    }
+
+    div[data-testid="stTabs"] button[aria-selected="true"] {
+        border-bottom: 2px solid #2563eb;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .profile-strip,
+        .risk-card,
+        .chat-system,
+        .chat-customer,
+        .chat-agent,
+        .chat-guidance,
+        .layer-box,
+        .scenario-card,
+        div[data-testid="stExpander"] details,
+        [data-testid="stSidebar"] .rad-sidebar-card {
+            color: #111827 !important;
+        }
+    }
     </style>
     """, unsafe_allow_html=True)
 

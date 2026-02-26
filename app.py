@@ -90,12 +90,28 @@ from ui.sidebar import render_sidebar
 render_sidebar()
 
 # ── Navigation ───────────────────────────────────────────────────────────────
+pending_l2_count = sum(
+    1 for case in st.session_state.get("l2_queue", [])
+    if case.get("status") == "pending"
+)
+
+if pending_l2_count > 0 and st.session_state.active_view != "L2 Floor Manager":
+    st.warning(
+        f"{pending_l2_count} case(s) pending in L2 queue. "
+        "Switch to L2 Floor Manager to review and resolve escalations."
+    )
+
 views = ["L1 Agent Dashboard", "L2 Floor Manager", "System Overview"]
 selected = st.radio(
     "Navigation",
     views,
     index=views.index(st.session_state.active_view),
     horizontal=True,
+    format_func=lambda v: (
+        f"L2 Floor Manager ({pending_l2_count} pending)"
+        if v == "L2 Floor Manager" and pending_l2_count > 0
+        else v
+    ),
     label_visibility="collapsed",
 )
 st.session_state.active_view = selected
