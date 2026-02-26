@@ -1,4 +1,21 @@
+# Database
+backend/data/rad_seed_data.db
+
+# Environment
 .env
+backend/.env
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
 

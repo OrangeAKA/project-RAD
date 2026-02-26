@@ -701,7 +701,8 @@ def create_database(db_path: str) -> None:
                 classification TEXT, risk_score INTEGER,
                 recommended_action TEXT, agent_decision TEXT,
                 override_reason TEXT, escalated_to_l2 BOOLEAN DEFAULT 0,
-                l2_decision TEXT, l2_reason TEXT
+                l2_decision TEXT, l2_reason TEXT,
+                evidence_narrative TEXT
             );""")
 
         conn.commit()

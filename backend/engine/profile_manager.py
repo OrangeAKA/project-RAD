@@ -101,20 +101,21 @@ def log_interaction(customer_id: str, booking_id: str, classification: str,
                     agent_decision: str, override_reason: str | None = None,
                     escalated_to_l2: bool = False,
                     l2_decision: str | None = None,
-                    l2_reason: str | None = None) -> int:
+                    l2_reason: str | None = None,
+                    evidence_narrative: str | None = None) -> int:
     """Log a decision to the decision_log table. Returns log_id."""
     return execute(
         """
         INSERT INTO decision_log
         (customer_id, booking_id, classification, risk_score,
          recommended_action, agent_decision, override_reason,
-         escalated_to_l2, l2_decision, l2_reason)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         escalated_to_l2, l2_decision, l2_reason, evidence_narrative)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             customer_id, booking_id, classification, risk_score,
             recommended_action, agent_decision, override_reason,
-            1 if escalated_to_l2 else 0, l2_decision, l2_reason,
+            1 if escalated_to_l2 else 0, l2_decision, l2_reason, evidence_narrative,
         ),
     )
 
@@ -131,9 +132,9 @@ def update_l2_decision(log_id: int, l2_decision: str, l2_reason: str) -> None:
     )
 
 
-def ensure_decision_log_table() -> None:
+def ensure_decision_log_table(db_path: str | None = None) -> None:
     """Create the decision_log table if it doesn't exist."""
-    conn = get_connection()
+    conn = get_connection(db_path)
     try:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS decision_log (
@@ -148,9 +149,14 @@ def ensure_decision_log_table() -> None:
                 override_reason TEXT,
                 escalated_to_l2 BOOLEAN DEFAULT 0,
                 l2_decision TEXT,
-                l2_reason TEXT
+                l2_reason TEXT,
+                evidence_narrative TEXT
             )
         """)
+        columns = conn.execute("PRAGMA table_info(decision_log)").fetchall()
+        column_names = {c["name"] for c in columns}
+        if "evidence_narrative" not in column_names:
+            conn.execute("ALTER TABLE decision_log ADD COLUMN evidence_narrative TEXT")
         conn.commit()
     finally:
         conn.close()
