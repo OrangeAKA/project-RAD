@@ -33,7 +33,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from routes import assessments, calls, customers, escalations, guidance, metrics, resolutions
+from routes import assessments, calls, customers, escalations, guidance, metrics, parse_concern, resolutions
 
 app.include_router(calls.router, prefix="/api", tags=["Calls"])
 app.include_router(customers.router, prefix="/api", tags=["Customers"])
@@ -42,6 +42,7 @@ app.include_router(guidance.router, prefix="/api", tags=["Guidance"])
 app.include_router(resolutions.router, prefix="/api", tags=["Resolutions"])
 app.include_router(escalations.router, prefix="/api", tags=["Escalations"])
 app.include_router(metrics.router, prefix="/api", tags=["Metrics"])
+app.include_router(parse_concern.router, prefix="/api", tags=["Parse"])
 
 
 @app.get("/")
