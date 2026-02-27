@@ -15,6 +15,10 @@ class ParseConcernRequest(BaseModel):
     agent_input: str
 
 
+class ParaphraseContextRequest(BaseModel):
+    customer_message: str
+
+
 def _get_groq_client():
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
@@ -32,6 +36,10 @@ Respond with ONLY a JSON object. No explanation, no markdown, no extra text.
 
 Agent's input:
 {agent_input}"""
+
+PARAPHRASE_PROMPT = """You are a customer service agent writing an internal note. Paraphrase the following customer statement into a brief first-person agent note. Write as if you are the agent summarizing what the customer told you. Keep it to 1-2 sentences. Do not quote the customer directly. Do not add any information the customer didn't mention.
+Customer said: {customer_message}
+Write ONLY the agent's note. No preamble."""
 
 
 def _validate_order(order_id: str, customer_id: str) -> dict:
@@ -118,3 +126,27 @@ def parse_concern(req: ParseConcernRequest):
         result["booking_summary"] = None
 
     return result
+
+
+@router.post("/paraphrase-context")
+def paraphrase_context(req: ParaphraseContextRequest):
+    """Paraphrase customer message into a concise internal agent note."""
+    client = _get_groq_client()
+    if not client:
+        return {"paraphrased": None, "llm_available": False}
+
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": PARAPHRASE_PROMPT.format(customer_message=req.customer_message)}],
+            temperature=0.2,
+            max_tokens=180,
+        )
+        text = response.choices[0].message.content.strip()
+        if text.startswith("```"):
+            text = text.split("\n", 1)[-1]
+            if text.endswith("```"):
+                text = text[:-3]
+        return {"paraphrased": text.strip()}
+    except Exception:
+        return {"paraphrased": None, "llm_available": False}

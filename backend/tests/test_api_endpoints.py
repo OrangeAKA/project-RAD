@@ -167,6 +167,64 @@ def test_parse_concern_insufficient_context_with_order_id(monkeypatch):
     assert "please also describe the customer's concern" in data.get("message", "").lower()
 
 
+def test_paraphrase_context_success(monkeypatch):
+    from routes import parse_concern as parse_concern_module
+    from types import SimpleNamespace
+
+    class _FakeClient:
+        class _Chat:
+            class _Completions:
+                @staticmethod
+                def create(**kwargs):
+                    return SimpleNamespace(
+                        choices=[
+                            SimpleNamespace(
+                                message=SimpleNamespace(
+                                    content=(
+                                        "Customer reports the guide did not show up for their booking and "
+                                        "is requesting a full refund."
+                                    )
+                                )
+                            )
+                        ]
+                    )
+
+            completions = _Completions()
+
+        chat = _Chat()
+
+    monkeypatch.setattr(parse_concern_module, "_get_groq_client", lambda: _FakeClient())
+
+    r = client.post(
+        "/api/paraphrase-context",
+        json={
+            "customer_message": (
+                "Hi, I booked the Colosseum tour for last Sunday but nobody was waiting. "
+                "We waited 30 minutes and the guide never showed up. I'd like a full refund."
+            )
+        },
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert isinstance(data.get("paraphrased"), str)
+    assert data.get("paraphrased", "").strip() != ""
+
+
+def test_paraphrase_context_fallback_when_llm_unavailable(monkeypatch):
+    from routes import parse_concern as parse_concern_module
+
+    monkeypatch.setattr(parse_concern_module, "_get_groq_client", lambda: None)
+
+    r = client.post(
+        "/api/paraphrase-context",
+        json={"customer_message": "The guide did not arrive and I want a refund."},
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert data.get("paraphrased") is None
+    assert data.get("llm_available") is False
+
+
 # ── Assessments ──────────────────────────────────────────────────────────────
 
 
