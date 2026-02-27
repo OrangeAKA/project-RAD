@@ -84,21 +84,34 @@ def parse_concern(req: ParseConcernRequest):
 
     order_id = extracted.get("order_id")
     refund_reason = extracted.get("refund_reason", "other")
-    summary = extracted.get("summary", "")
+    summary = extracted.get("summary")
 
     valid_reasons = {"no_show", "cancellation", "partial_service", "technical_issue", "other"}
     if refund_reason not in valid_reasons:
         refund_reason = "other"
 
+    summary_text = summary if isinstance(summary, str) else ""
+
     result = {
         "parsed": True,
         "order_id": order_id,
         "refund_reason": refund_reason,
-        "summary": summary,
+        "summary": summary_text,
     }
 
     if order_id:
-        result.update(_validate_order(order_id, req.customer_id))
+        order_validation = _validate_order(order_id, req.customer_id)
+        if refund_reason == "other" and not summary_text.strip():
+            return {
+                "parsed": True,
+                "order_id": order_id,
+                "order_valid": order_validation["order_valid"],
+                "order_error": order_validation["order_error"],
+                "booking_summary": order_validation["booking_summary"],
+                "insufficient_context": True,
+                "message": "Order ID found, but please also describe the customer's concern and reason for the refund request.",
+            }
+        result.update(order_validation)
     else:
         result["order_valid"] = False
         result["order_error"] = "No order ID found in agent input"

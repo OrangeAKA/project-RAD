@@ -47,7 +47,13 @@ def get_escalation_queue():
             ORDER BY COALESCE(dl.risk_score, 0) DESC, dl.timestamp DESC
             """
         ).fetchall()
-        return [dict(row) for row in rows]
+        queue = []
+        for row in rows:
+            item = dict(row)
+            item.setdefault("agent_concern", None)
+            item.setdefault("customer_message", None)
+            queue.append(item)
+        return queue
     finally:
         conn.close()
 
@@ -95,8 +101,12 @@ def get_escalation_detail(log_id: int):
             layer3 = evaluate_request(booking_dict, layer0["enrichment"], layer2.get("risk_score"))
         final = classify(layer0, layer1, layer2, layer3)
 
+        log_entry = dict(row)
+        log_entry.setdefault("agent_concern", None)
+        log_entry.setdefault("customer_message", None)
+
         return {
-            "log": dict(row),
+            "log": log_entry,
             "narrative_summary": row["evidence_narrative"],
             "customer_profile": profile,
             "booking_history": booking_history_dicts,

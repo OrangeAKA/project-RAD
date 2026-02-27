@@ -123,6 +123,50 @@ def test_get_customer_payment_not_found():
     assert r.status_code == 404
 
 
+# ── Parse Concern ─────────────────────────────────────────────────────────────
+
+
+def test_parse_concern_insufficient_context_with_order_id(monkeypatch):
+    from routes import parse_concern as parse_concern_module
+    from types import SimpleNamespace
+
+    class _FakeClient:
+        class _Chat:
+            class _Completions:
+                @staticmethod
+                def create(**kwargs):
+                    return SimpleNamespace(
+                        choices=[
+                            SimpleNamespace(
+                                message=SimpleNamespace(
+                                    content='{"order_id":"CUST_001_B030","refund_reason":"other","summary":null}'
+                                )
+                            )
+                        ]
+                    )
+
+            completions = _Completions()
+
+        chat = _Chat()
+
+    monkeypatch.setattr(parse_concern_module, "_get_groq_client", lambda: _FakeClient())
+
+    r = client.post(
+        "/api/parse-concern",
+        json={
+            "customer_id": "CUST_001",
+            "agent_input": "Booking CUST_001_B030. please help",
+        },
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert data.get("parsed") is True
+    assert data.get("order_id") == "CUST_001_B030"
+    assert data.get("order_valid") is True
+    assert data.get("insufficient_context") is True
+    assert "please also describe the customer's concern" in data.get("message", "").lower()
+
+
 # ── Assessments ──────────────────────────────────────────────────────────────
 
 
@@ -342,6 +386,41 @@ def test_resolve_medium_risk_compat_approve_full_refund_no_override():
     )
     assert r.status_code == 200
     assert r.json().get("logged") is True
+
+
+def test_escalation_includes_agent_context_fields():
+    r = client.post(
+        "/api/resolve",
+        json={
+            "customer_id": "CUST_018",
+            "booking_id": "CUST_018_B015",
+            "classification": "medium_risk",
+            "risk_score": 55,
+            "recommended_action": "Review recommended.",
+            "agent_decision": "escalated_to_l2",
+            "escalate_to_l2": True,
+            "agent_concern": "Agent suspects timing inconsistency in customer account.",
+            "customer_message": "I never got confirmation and missed the entry window.",
+        },
+    )
+    assert r.status_code == 200
+    log_id = r.json().get("log_id")
+    assert log_id is not None
+
+    queue_resp = client.get("/api/escalations")
+    assert queue_resp.status_code == 200
+    queue = queue_resp.json()
+    entry = next((item for item in queue if item.get("log_id") == log_id), None)
+    assert entry is not None
+    assert entry.get("agent_concern") == "Agent suspects timing inconsistency in customer account."
+    assert entry.get("customer_message") == "I never got confirmation and missed the entry window."
+
+    detail_resp = client.get(f"/api/escalations/{log_id}")
+    assert detail_resp.status_code == 200
+    detail = detail_resp.json()
+    assert "log" in detail
+    assert detail["log"].get("agent_concern") == "Agent suspects timing inconsistency in customer account."
+    assert detail["log"].get("customer_message") == "I never got confirmation and missed the entry window."
 
 
 # ── Escalations ──────────────────────────────────────────────────────────────

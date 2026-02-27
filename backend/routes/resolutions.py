@@ -37,6 +37,8 @@ class ResolutionRequest(BaseModel):
     agent_decision: str
     override_reason: str | None = None
     agent_notes: str | None = None
+    agent_concern: str | None = None
+    customer_message: str | None = None
     escalate_to_l2: bool = False
     signal_breakdown: list[dict] | None = None
 
@@ -124,6 +126,8 @@ def resolve_case(req: ResolutionRequest):
             override_reason=req.override_reason,
             escalated_to_l2=req.escalate_to_l2,
             evidence_narrative=evidence_narrative,
+            agent_concern=req.agent_concern if req.escalate_to_l2 else None,
+            customer_message=req.customer_message if req.escalate_to_l2 else None,
         )
 
         if req.agent_notes:

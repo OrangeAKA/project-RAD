@@ -102,20 +102,24 @@ def log_interaction(customer_id: str, booking_id: str, classification: str,
                     escalated_to_l2: bool = False,
                     l2_decision: str | None = None,
                     l2_reason: str | None = None,
-                    evidence_narrative: str | None = None) -> int:
+                    evidence_narrative: str | None = None,
+                    agent_concern: str | None = None,
+                    customer_message: str | None = None) -> int:
     """Log a decision to the decision_log table. Returns log_id."""
     return execute(
         """
         INSERT INTO decision_log
         (customer_id, booking_id, classification, risk_score,
          recommended_action, agent_decision, override_reason,
-         escalated_to_l2, l2_decision, l2_reason, evidence_narrative)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         escalated_to_l2, l2_decision, l2_reason, evidence_narrative,
+         agent_concern, customer_message)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             customer_id, booking_id, classification, risk_score,
             recommended_action, agent_decision, override_reason,
             1 if escalated_to_l2 else 0, l2_decision, l2_reason, evidence_narrative,
+            agent_concern, customer_message,
         ),
     )
 
@@ -150,13 +154,19 @@ def ensure_decision_log_table(db_path: str | None = None) -> None:
                 escalated_to_l2 BOOLEAN DEFAULT 0,
                 l2_decision TEXT,
                 l2_reason TEXT,
-                evidence_narrative TEXT
+                evidence_narrative TEXT,
+                agent_concern TEXT,
+                customer_message TEXT
             )
         """)
         columns = conn.execute("PRAGMA table_info(decision_log)").fetchall()
         column_names = {c["name"] for c in columns}
         if "evidence_narrative" not in column_names:
             conn.execute("ALTER TABLE decision_log ADD COLUMN evidence_narrative TEXT")
+        if "agent_concern" not in column_names:
+            conn.execute("ALTER TABLE decision_log ADD COLUMN agent_concern TEXT")
+        if "customer_message" not in column_names:
+            conn.execute("ALTER TABLE decision_log ADD COLUMN customer_message TEXT")
         conn.commit()
     finally:
         conn.close()
