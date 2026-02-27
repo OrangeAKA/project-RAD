@@ -566,27 +566,28 @@ def _build_all():
     # ── Customer profile rows ───────────────────────────────────────────
     # (customer_id, name, account_created_at, total_bookings, total_refunds,
     #  total_no_show_refund_claims, no_show_claims_contradicted, refund_rate,
-    #  last_profile_computed_at, risk_score, disposition, is_retrospective_fraud_flag)
+    #  last_profile_computed_at, risk_score, disposition, is_retrospective_fraud_flag,
+    #  payment_type, payment_last_four, payment_gateway)
     lpc = _ts(datetime(2026, 2, 25, 12, 0))
     customers = [
-        ("CUST_001", "Priya Sharma",    _ts(datetime(2023, 8, 1, 10, 0)),  32, 2,  0, 0, 2/32,  lpc, 8,    "green",  0),
-        ("CUST_002", "Daniel Kim",      _ts(datetime(2024, 8, 1, 10, 0)),  14, 1,  0, 0, 1/14,  lpc, 5,    "green",  0),
-        ("CUST_003", "Elena Rossi",     _ts(datetime(2023, 2, 1, 10, 0)),  45, 4,  1, 0, 4/45,  lpc, 12,   "green",  0),
-        ("CUST_004", "Raj Mehta",       _ts(datetime(2025, 8, 1, 10, 0)),   5, 0,  0, 0, 0.0,   lpc, 3,    "green",  0),
-        ("CUST_005", "Sophie Laurent",  _ts(datetime(2026, 2, 10, 10, 0)),  1, 0,  0, 0, 0.0,   None, None,"green",  0),
-        ("CUST_006", "Marco Torres",    _ts(datetime(2024, 8, 1, 10, 0)),  11, 5,  3, 1, 5/11,  lpc, 74,   "red",    0),
-        ("CUST_007", "Lisa Chen",       _ts(datetime(2025, 4, 1, 10, 0)),   8, 4,  2, 0, 4/8,   lpc, 62,   "red",    0),
-        ("CUST_008", "Tom Wallace",     _ts(datetime(2025, 6, 1, 10, 0)),   6, 3,  2, 2, 3/6,   lpc, 81,   "red",    0),
-        ("CUST_009", "Ananya Nair",     _ts(datetime(2024, 2, 1, 10, 0)),  20, 6,  2, 0, 6/20,  lpc, 42,   "yellow", 0),
-        ("CUST_010", "James Liu",       _ts(datetime(2025, 4, 15, 10, 0)), 18, 11, 1, 0, 11/18, lpc, 68,   "red",    0),
-        ("CUST_011", "Victor Okafor",   _ts(datetime(2025, 2, 1, 10, 0)),  22, 9,  0, 0, 9/22,  lpc, 55,   "yellow", 0),
-        ("CUST_012", "Sasha Petrov",    _ts(datetime(2025, 10, 1, 10, 0)),  7, 5,  0, 0, 5/7,   lpc, 78,   "red",    0),
-        ("CUST_013", "Nina Volkov",     _ts(datetime(2025, 11, 1, 10, 0)),  5, 4,  0, 0, 4/5,   lpc, 85,   "red",    0),
-        ("CUST_014", "Aisha Khan",      _ts(datetime(2024, 2, 1, 10, 0)),   9, 6,  2, 2, 6/9,   lpc, 82,   "red",    1),
-        ("CUST_015", "Sarah Mitchell",  _ts(datetime(2025, 2, 1, 10, 0)),  12, 1,  0, 0, 1/12,  lpc, 10,   "green",  0),
-        ("CUST_016", "Kenji Tanaka",    _ts(datetime(2025, 6, 1, 10, 0)),   7, 0,  0, 0, 0.0,   _ts(datetime(2026, 2, 20, 12, 0)), 4, "green", 0),
-        ("CUST_017", "Maria Garcia",    _ts(datetime(2024, 2, 1, 10, 0)),  25, 2,  0, 0, 2/25,  lpc, 9,    "green",  0),
-        ("CUST_018", "Alex Drummond",   _ts(datetime(2025, 2, 1, 10, 0)),  15, 5,  1, 0, 5/15,  lpc, 38,   "yellow", 0),
+        ("CUST_001", "Priya Sharma",    _ts(datetime(2023, 8, 1, 10, 0)),  32, 2,  0, 0, 2/32,  lpc, 8,    "green",  0, "upi",        "4821", "razorpay"),
+        ("CUST_002", "Daniel Kim",      _ts(datetime(2024, 8, 1, 10, 0)),  14, 1,  0, 0, 1/14,  lpc, 5,    "green",  0, "visa",       "7394", "stripe"),
+        ("CUST_003", "Elena Rossi",     _ts(datetime(2023, 2, 1, 10, 0)),  45, 4,  1, 0, 4/45,  lpc, 12,   "green",  0, "mastercard", "1567", "stripe"),
+        ("CUST_004", "Raj Mehta",       _ts(datetime(2025, 8, 1, 10, 0)),   5, 0,  0, 0, 0.0,   lpc, 3,    "green",  0, "mastercard", "2043", "razorpay"),
+        ("CUST_005", "Sophie Laurent",  _ts(datetime(2026, 2, 10, 10, 0)),  1, 0,  0, 0, 0.0,   None, None,"green",  0, "paypal",     "8810", "stripe"),
+        ("CUST_006", "Marco Torres",    _ts(datetime(2024, 8, 1, 10, 0)),  11, 5,  3, 1, 5/11,  lpc, 74,   "red",    0, "amex",       "5319", "stripe"),
+        ("CUST_007", "Lisa Chen",       _ts(datetime(2025, 4, 1, 10, 0)),   8, 4,  2, 0, 4/8,   lpc, 62,   "red",    0, "mastercard", "6924", "stripe"),
+        ("CUST_008", "Tom Wallace",     _ts(datetime(2025, 6, 1, 10, 0)),   6, 3,  2, 2, 3/6,   lpc, 81,   "red",    0, "visa",       "9185", "stripe"),
+        ("CUST_009", "Ananya Nair",     _ts(datetime(2024, 2, 1, 10, 0)),  20, 6,  2, 0, 6/20,  lpc, 42,   "yellow", 0, "visa",       "3472", "razorpay"),
+        ("CUST_010", "James Liu",       _ts(datetime(2025, 4, 15, 10, 0)), 18, 11, 1, 0, 11/18, lpc, 68,   "red",    0, "visa",       "1058", "razorpay"),
+        ("CUST_011", "Victor Okafor",   _ts(datetime(2025, 2, 1, 10, 0)),  22, 9,  0, 0, 9/22,  lpc, 55,   "yellow", 0, "mastercard", "7736", "stripe"),
+        ("CUST_012", "Sasha Petrov",    _ts(datetime(2025, 10, 1, 10, 0)),  7, 5,  0, 0, 5/7,   lpc, 78,   "red",    0, "amex",       "6402", "stripe"),
+        ("CUST_013", "Nina Volkov",     _ts(datetime(2025, 11, 1, 10, 0)),  5, 4,  0, 0, 4/5,   lpc, 85,   "red",    0, "paypal",     "2241", "stripe"),
+        ("CUST_014", "Aisha Khan",      _ts(datetime(2024, 2, 1, 10, 0)),   9, 6,  2, 2, 6/9,   lpc, 82,   "red",    1, "upi",        "6648", "razorpay"),
+        ("CUST_015", "Sarah Mitchell",  _ts(datetime(2025, 2, 1, 10, 0)),  12, 1,  0, 0, 1/12,  lpc, 10,   "green",  0, "visa",       "2870", "razorpay"),
+        ("CUST_016", "Kenji Tanaka",    _ts(datetime(2025, 6, 1, 10, 0)),   7, 0,  0, 0, 0.0,   _ts(datetime(2026, 2, 20, 12, 0)), 4, "green", 0, "mastercard", "9152", "stripe"),
+        ("CUST_017", "Maria Garcia",    _ts(datetime(2024, 2, 1, 10, 0)),  25, 2,  0, 0, 2/25,  lpc, 9,    "green",  0, "visa",       "3586", "stripe"),
+        ("CUST_018", "Alex Drummond",   _ts(datetime(2025, 2, 1, 10, 0)),  15, 5,  1, 0, 5/15,  lpc, 38,   "yellow", 0, "mastercard", "7290", "razorpay"),
     ]
 
     return customers, bookings, calls
@@ -607,7 +608,10 @@ CREATE TABLE IF NOT EXISTS customer_profiles (
     last_profile_computed_at TIMESTAMP,
     risk_score INTEGER,
     disposition TEXT CHECK(disposition IN ('green', 'yellow', 'red')),
-    is_retrospective_fraud_flag INTEGER DEFAULT 0
+    is_retrospective_fraud_flag INTEGER DEFAULT 0,
+    payment_type TEXT CHECK(payment_type IN ('visa', 'mastercard', 'amex', 'upi', 'paypal')),
+    payment_last_four TEXT,
+    payment_gateway TEXT CHECK(payment_gateway IN ('stripe', 'razorpay'))
 );"""
 
 _DDL_BOOKINGS = """
@@ -655,8 +659,9 @@ CREATE TABLE IF NOT EXISTS incoming_calls (
 _INS_CUST = """INSERT OR REPLACE INTO customer_profiles
 (customer_id,customer_name,account_created_at,total_bookings,total_refunds,
  total_no_show_refund_claims,no_show_claims_contradicted,refund_rate,
- last_profile_computed_at,risk_score,disposition,is_retrospective_fraud_flag)
-VALUES (?,?,?,?,?,?,?,?,?,?,?,?);"""
+ last_profile_computed_at,risk_score,disposition,is_retrospective_fraud_flag,
+ payment_type,payment_last_four,payment_gateway)
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"""
 
 _INS_BK = """INSERT OR REPLACE INTO booking_refund_records
 (booking_id,customer_id,experience_id,experience_name,experience_category,

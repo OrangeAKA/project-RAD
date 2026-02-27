@@ -84,3 +84,23 @@ def get_agent_note_signals(customer_id: str):
         }
     finally:
         conn.close()
+
+
+@router.get("/customer/{customer_id}/payment")
+def get_customer_payment(customer_id: str):
+    """Return payment method details for a customer."""
+    conn = get_db_connection()
+    try:
+        row = conn.execute(
+            """
+            SELECT customer_id, payment_type, payment_last_four, payment_gateway
+            FROM customer_profiles
+            WHERE customer_id = ?
+            """,
+            (customer_id,),
+        ).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Customer not found")
+        return dict(row)
+    finally:
+        conn.close()

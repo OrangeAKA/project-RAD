@@ -107,6 +107,22 @@ def test_get_agent_note_signals():
     assert "llm_available" in data
 
 
+def test_get_customer_payment():
+    r = client.get("/api/customer/CUST_001/payment")
+    assert r.status_code == 200
+    data = r.json()
+    assert data.get("customer_id") == "CUST_001"
+    assert data.get("payment_type") in {"visa", "mastercard", "amex", "upi", "paypal"}
+    assert isinstance(data.get("payment_last_four"), str)
+    assert len(data.get("payment_last_four")) == 4
+    assert data.get("payment_gateway") in {"stripe", "razorpay"}
+
+
+def test_get_customer_payment_not_found():
+    r = client.get("/api/customer/INVALID_CUST/payment")
+    assert r.status_code == 404
+
+
 # ── Assessments ──────────────────────────────────────────────────────────────
 
 
