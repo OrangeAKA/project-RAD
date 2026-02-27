@@ -15,7 +15,7 @@ _NON_OVERRIDE_DECISIONS: dict[str, set[str]] = {
     "vendor_anomaly": {"process_refund", "process_refund_vendor_issue"},
     "auto_approved": {"confirm_to_customer", "approved_full_refund", "approve_full_refund"},
     "auto_flagged_l2": {"escalated_to_l2"},
-    "low_risk": {"approved_full_refund", "approve_full_refund"},
+    "low_risk": {"approved_full_refund", "approve_full_refund", "request_more_info"},
     "medium_risk": {
         "approved_full_refund",
         "approve_full_refund",
