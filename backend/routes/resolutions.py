@@ -11,6 +11,22 @@ from utils.db import get_db_connection
 
 router = APIRouter()
 
+_NON_OVERRIDE_DECISIONS: dict[str, set[str]] = {
+    "vendor_anomaly": {"process_refund", "process_refund_vendor_issue"},
+    "auto_approved": {"confirm_to_customer", "approved_full_refund", "approve_full_refund"},
+    "auto_flagged_l2": {"escalated_to_l2"},
+    "low_risk": {"approved_full_refund", "approve_full_refund"},
+    "medium_risk": {
+        "approved_full_refund",
+        "approve_full_refund",
+        "offer_partial_refund",
+        "offer_coupon",
+        "escalated_to_l2",
+        "request_more_info",
+    },
+    "high_risk": {"escalated_to_l2"},
+}
+
 
 class ResolutionRequest(BaseModel):
     customer_id: str
@@ -30,6 +46,13 @@ def _get_groq_client():
     if not api_key:
         return None
     return OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
+
+
+def _is_override(classification: str, agent_decision: str) -> bool:
+    allowed_decisions = _NON_OVERRIDE_DECISIONS.get((classification or "").strip().lower())
+    if not allowed_decisions:
+        return True
+    return (agent_decision or "").strip().lower() not in allowed_decisions
 
 
 @router.post("/resolve")
@@ -53,7 +76,7 @@ def resolve_case(req: ResolutionRequest):
         if booking["customer_id"] != req.customer_id:
             raise HTTPException(status_code=400, detail="Order does not belong to this customer")
 
-        if req.agent_decision != req.recommended_action and not req.override_reason:
+        if _is_override(req.classification, req.agent_decision) and not req.override_reason:
             raise HTTPException(status_code=400, detail="override_reason is required when overriding recommendation")
 
         evidence_narrative = None

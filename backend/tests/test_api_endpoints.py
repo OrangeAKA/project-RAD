@@ -247,8 +247,7 @@ def test_resolve():
             "classification": "medium_risk",
             "risk_score": 42,
             "recommended_action": "Review recommended. See evidence card for details.",
-            "agent_decision": "approve_full_refund",
-            "override_reason": "Customer provided documentation; approved per policy",
+            "agent_decision": "approved_full_refund",
             "escalate_to_l2": False,
         },
     )
@@ -269,7 +268,6 @@ def test_resolve_with_escalation():
             "risk_score": 55,
             "recommended_action": "Review recommended.",
             "agent_decision": "escalated_to_l2",
-            "override_reason": "Escalating for manual review",
             "escalate_to_l2": True,
         },
     )
@@ -277,6 +275,57 @@ def test_resolve_with_escalation():
     data = r.json()
     assert data.get("logged") is True
     assert data.get("escalated") is True
+
+
+def test_resolve_high_risk_escalation_no_override_reason_required():
+    r = client.post(
+        "/api/resolve",
+        json={
+            "customer_id": "CUST_008",
+            "booking_id": "CUST_008_B006",
+            "classification": "high_risk",
+            "risk_score": 81,
+            "recommended_action": "Escalation recommended.",
+            "agent_decision": "escalated_to_l2",
+            "escalate_to_l2": True,
+        },
+    )
+    assert r.status_code == 200
+    assert r.json().get("logged") is True
+
+
+def test_resolve_high_risk_approval_requires_override_reason():
+    r = client.post(
+        "/api/resolve",
+        json={
+            "customer_id": "CUST_008",
+            "booking_id": "CUST_008_B006",
+            "classification": "high_risk",
+            "risk_score": 81,
+            "recommended_action": "Escalation recommended.",
+            "agent_decision": "approved_full_refund",
+            "escalate_to_l2": False,
+        },
+    )
+    assert r.status_code == 400
+    assert "override_reason is required" in r.json().get("detail", "")
+
+
+def test_resolve_medium_risk_compat_approve_full_refund_no_override():
+    r = client.post(
+        "/api/resolve",
+        json={
+            "customer_id": "CUST_009",
+            "booking_id": "CUST_009_B020",
+            "classification": "medium_risk",
+            "risk_score": 42,
+            "recommended_action": "Review recommended.",
+            "agent_decision": "approve_full_refund",
+            "escalate_to_l2": False,
+        },
+    )
+    assert r.status_code == 200
+    assert r.json().get("logged") is True
 
 
 # ── Escalations ──────────────────────────────────────────────────────────────
