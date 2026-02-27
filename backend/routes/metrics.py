@@ -1,9 +1,18 @@
+from pathlib import Path
+
 from fastapi import APIRouter
 
 from engine import config
 from utils.db import get_db_connection
 
 router = APIRouter()
+
+_POLICY_FILES = [
+    ("Cancellation Policy", "cancellation_policy.md"),
+    ("Agent Response Guidelines", "agent_response_guidelines.md"),
+    ("Escalation Criteria", "escalation_criteria.md"),
+    ("Supplier Types Reference", "supplier_types_reference.md"),
+]
 
 
 def _pct(part: int, total: int) -> float:
@@ -116,3 +125,22 @@ def get_engine_config():
             "HIGH_RISK_FLOOR": config.HIGH_RISK_FLOOR,
         },
     }
+
+
+@router.get("/policies")
+def get_policies():
+    """Return markdown policy documents for frontend policy display."""
+    policies_dir = Path(__file__).resolve().parents[1] / "data" / "policies"
+    policies = []
+
+    for policy_name, filename in _POLICY_FILES:
+        content = (policies_dir / filename).read_text(encoding="utf-8")
+        policies.append(
+            {
+                "name": policy_name,
+                "filename": filename,
+                "content": content,
+            }
+        )
+
+    return {"policies": policies}

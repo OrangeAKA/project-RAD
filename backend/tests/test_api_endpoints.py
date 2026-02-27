@@ -409,3 +409,19 @@ def test_get_config():
     assert "layer2" in data
     assert "layer3" in data
     assert "classification" in data
+
+
+def test_get_policies():
+    r = client.get("/api/policies")
+    assert r.status_code == 200
+    data = r.json()
+    assert "policies" in data
+    assert isinstance(data["policies"], list)
+    assert len(data["policies"]) == 4
+
+    first = data["policies"][0]
+    assert "name" in first
+    assert "filename" in first
+    assert "content" in first
+    assert isinstance(first["content"], str)
+    assert len(first["content"]) > 0
