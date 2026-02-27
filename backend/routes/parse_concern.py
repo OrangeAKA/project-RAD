@@ -67,7 +67,7 @@ def _validate_order(order_id: str, customer_id: str) -> dict:
         conn.close()
 
 
-@router.post("/parse-concern")
+@router.post("/parse-concern", summary="Parse concern from agent input - uses LLM (with fallback)")
 def parse_concern(req: ParseConcernRequest):
     """Extract order ID, refund reason, and summary from agent free text via LLM."""
     client = _get_groq_client()
@@ -128,7 +128,7 @@ def parse_concern(req: ParseConcernRequest):
     return result
 
 
-@router.post("/paraphrase-context")
+@router.post("/paraphrase-context", summary="Paraphrase customer context - uses LLM (with fallback)")
 def paraphrase_context(req: ParaphraseContextRequest):
     """Paraphrase customer message into a concise internal agent note."""
     client = _get_groq_client()

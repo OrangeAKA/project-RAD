@@ -82,7 +82,7 @@ def validate_order(req: OrderValidation):
         conn.close()
 
 
-@router.post("/assess")
+@router.post("/assess", summary="Run refund assessment - uses LLM for response script (with fallback)")
 def run_assessment(req: AssessmentRequest):
     """Run the full 4-layer assessment on a specific order."""
     conn = get_db_connection()

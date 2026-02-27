@@ -57,7 +57,7 @@ def _is_override(classification: str, agent_decision: str) -> bool:
     return (agent_decision or "").strip().lower() not in allowed_decisions
 
 
-@router.post("/resolve")
+@router.post("/resolve", summary="Resolve case - conditionally uses LLM for escalation narrative (with fallback)")
 def resolve_case(req: ResolutionRequest):
     """Log the agent's decision and update the customer profile."""
     conn = get_db_connection()

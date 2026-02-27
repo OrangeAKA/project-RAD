@@ -58,7 +58,7 @@ def get_escalation_queue():
         conn.close()
 
 
-@router.get("/escalations/{log_id}")
+@router.get("/escalations/{log_id}", summary="Get escalation detail - conditionally uses LLM for note signals (with fallback)")
 def get_escalation_detail(log_id: int):
     """Return full detail for a specific escalated case."""
     conn = get_db_connection()

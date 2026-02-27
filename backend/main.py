@@ -8,6 +8,13 @@ from data.generate_seed_data import create_database
 from engine.profile_manager import ensure_decision_log_table
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "data", "rad_seed_data.db")
+API_DESCRIPTION = """Refund Abuse Detection System — Backend API
+
+### API Legend (LLM Usage)
+- **Uses LLM (with fallback)**: endpoint calls Groq/OpenAI and gracefully falls back when unavailable.
+- **Conditionally uses LLM (with fallback)**: endpoint calls LLM only in specific branches.
+- **Deterministic**: endpoint does not use LLM.
+"""
 
 
 @asynccontextmanager
@@ -20,7 +27,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="RAD System API",
-    description="Refund Abuse Detection System — Backend API",
+    description=API_DESCRIPTION,
     version="1.0.0",
     lifespan=lifespan,
 )

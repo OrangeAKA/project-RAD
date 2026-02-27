@@ -17,7 +17,7 @@ class GuidanceRequest(BaseModel):
     agent_message: str
 
 
-@router.post("/guidance")
+@router.post("/guidance", summary="Get contextual guidance - uses LLM (with fallback)")
 def get_contextual_guidance(req: GuidanceRequest):
     """Generate contextual guidance based on agent's situational update."""
     policy_snippets = get_escalation_policy()

@@ -55,7 +55,7 @@ def get_customer_bookings(customer_id: str):
         conn.close()
 
 
-@router.get("/customer/{customer_id}/agent-notes")
+@router.get("/customer/{customer_id}/agent-notes", summary="Get agent note signals - uses LLM (with fallback)")
 def get_agent_note_signals(customer_id: str):
     """Extract signals from past agent notes for this customer."""
     conn = get_db_connection()

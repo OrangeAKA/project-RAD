@@ -50,6 +50,21 @@ Open:
 - API root: `http://localhost:8000/`
 - Swagger docs: `http://localhost:8000/docs`
 
+## API Legend (LLM Usage)
+
+- **Uses LLM (with fallback)**: endpoint calls Groq/OpenAI and gracefully falls back when unavailable.
+- **Conditionally uses LLM (with fallback)**: endpoint calls LLM only in specific branches.
+- **Deterministic**: endpoint does not use LLM.
+
+LLM-backed endpoints:
+- `POST /api/guidance` — uses LLM (with fallback)
+- `POST /api/assess` — uses LLM for response script (with fallback)
+- `GET /api/customer/{customer_id}/agent-notes` — uses LLM (with fallback)
+- `POST /api/parse-concern` — uses LLM (with fallback)
+- `POST /api/paraphrase-context` — uses LLM (with fallback)
+- `POST /api/resolve` — conditionally uses LLM for escalation narrative (with fallback)
+- `GET /api/escalations/{log_id}` — conditionally uses LLM for note signals (with fallback)
+
 ## Tests
 
 Install dev dependencies:
